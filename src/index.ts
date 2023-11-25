@@ -32,7 +32,8 @@ const uploadHandler = multer({
     fileFilter: (req: any, file, cb) => {
         // Check if the file type is an image
         if (assertFileType(file.mimetype)) {
-            return cb(null, true);
+            // cb(error, <allow or block upload>)
+            cb(null, true);
         } else {
             // accept only image files
             req.incorrectType = file.mimetype;
@@ -50,18 +51,18 @@ app.get('/', (req: Request, res: Response) => {
 
 // endpoint for file upload
 app.post('/upload', uploadHandler.single('image'), (req: any, res) => {
-    if (req.incorrectType) { // if image type is incorrect, error message
+    if (req.incorrectType) {
+        // if image type is incorrect, error message
         res.status(422).send('Invalid filetype ' + req.incorrectType);
-    } else {
-      res.send(req.file.path) 
     }
 
     // send url to vision api and get text
-    //getText('./test.png');
+    let text = getText(req.file.linkUrl);
 
     // TODO: parse text to get ingredient list
 
     // TODO: return ingredient list
+    res.status(200).send(text);
 });
 
 app.listen(port, () => {
