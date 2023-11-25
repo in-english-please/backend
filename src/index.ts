@@ -14,7 +14,7 @@ const fileTypes: String[] = ['image/png', 'image/jpeg', 'image/jpg'];
 // takes in the files' typing as a parameter
 function assertFileType(filetype: String) {
     // loops through all the accepted file types in the fileTypes array
-    for (let t in fileTypes) {
+    for (let t of fileTypes) {
         // if inputted files typing matches accepted file types, return true
         if (filetype == t) {
             return true;
@@ -35,7 +35,7 @@ const uploadHandler = multer({
             return cb(null, true);
         } else {
             // accept only image files
-            req.fileValidationError = 'Bad filetype';
+            req.incorrectType = file.mimetype;
             cb(null, false);
         }
     },
@@ -50,12 +50,14 @@ app.get('/', (req: Request, res: Response) => {
 
 // endpoint for file upload
 app.post('/upload', uploadHandler.single('image'), (req: any, res) => {
-    if (req.fileValidationError) {
-        res.status(422).send('Invalid filetype.');
+    if (req.incorrectType) { // if image type is incorrect, error message
+        res.status(422).send('Invalid filetype ' + req.incorrectType);
+    } else {
+      res.send(req.file.path) 
     }
 
     // send url to vision api and get text
-    getText('./test.png');
+    //getText('./test.png');
 
     // TODO: parse text to get ingredient list
 
