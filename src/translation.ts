@@ -5,6 +5,25 @@ interface Dictionary {
     [key: string]: string;
 }
 
+// finds the percentage of words in a that are also in b
+function wordsFound(a: String, b: String) {
+    // arrays of the words in strings a and b
+    let aWords = a.split(' ');
+    let bWords = b.split(' ');
+
+    // the number of words present within a that are also present within b
+    let numAWords = 0;
+
+    for (let aWord of aWords) {
+        if (bWords.find((x) => x == aWord)) {
+            numAWords++;
+        }
+    }
+
+    // returns the percentage of words present within a that are also within b
+    return numAWords / aWords.length;
+}
+
 function translate(rawIngredientList: String) {
     // use the interface to format the chemicalDictionary into a usable form
     const chemicalDictionaryObject = chemicalDictionary as Dictionary;
@@ -21,11 +40,16 @@ function translate(rawIngredientList: String) {
     for (let i = 0; i < ingredientArray.length; i++) {
         // iterate through the chemicalDictionary
         for (let chem in chemicalDictionary) {
-            // if chem includes any element within the ingredientArray, reassign the element at the index
-            if (chem.includes(ingredientArray[i])) {
+            // if the similarity between the two strings chem and ingredientArray[i] is greater than or equal to 50%, we translate it
+            if (
+                wordsFound(chem, ingredientArray[i]) *
+                    wordsFound(ingredientArray[i], chem) >=
+                0.5
+            ) {
                 ingredientArray[i] = chemicalDictionaryObject[chem];
             }
         }
+        console.log(ingredientArray);
     }
 
     return ingredientArray.join(', ');
