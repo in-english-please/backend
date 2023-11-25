@@ -1,0 +1,27 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "How to start up a typescript node server:\r 1. `npm init`",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:dev": "npx nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/in-english-please/backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/in-english-please/backend/issues"
+  },
+  "homepage": "https://github.com/in-english-please/backend#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "typescript": "^5.3.2"
+  }
+}
