@@ -2,6 +2,7 @@ import express, { Request, Response, Application } from 'express';
 import dotenv from 'dotenv';
 import { assert } from 'console';
 import { getText } from './gcIntegration';
+import translate from './translation';
 import multer from 'multer';
 import MulterGoogleCloudStorage from 'multer-cloud-storage';
 
@@ -59,10 +60,11 @@ app.post('/upload', uploadHandler.single('image'), async (req: any, res) => {
     // send url to vision api and get text
     let text = await getText(req.file.linkUrl);
 
-    // TODO: parse text to get ingredient list
+    // parse text to get ingredient list
+    let parsedIngredients = translate(text);
 
-    // TODO: return ingredient list
-    res.status(200).send(text);
+    // return ingredient list
+    res.status(200).send(parsedIngredients);
 });
 
 app.listen(port, () => {
