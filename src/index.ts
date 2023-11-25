@@ -50,14 +50,14 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 // endpoint for file upload
-app.post('/upload', uploadHandler.single('image'), (req: any, res) => {
+app.post('/upload', uploadHandler.single('image'), async (req: any, res) => {
     if (req.incorrectType) {
         // if image type is incorrect, error message
         res.status(422).send('Invalid filetype ' + req.incorrectType);
     }
 
     // send url to vision api and get text
-    let text = getText(req.file.linkUrl);
+    let text = await getText(req.file.linkUrl);
 
     // TODO: parse text to get ingredient list
 

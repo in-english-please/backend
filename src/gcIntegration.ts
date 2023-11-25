@@ -5,18 +5,27 @@ const vision = require('@google-cloud/vision');
  * @param fileUrl filepath to file (within bucket)
  * @returns text found within the image, formatted as Google Cloud defines
  */
-const getText: any = async (filename: String) => {
+const getText: any = async (fileUrl: String) => {
     const annotatorClient = new vision.ImageAnnotatorClient();
 
-    const bucketName = process.env.BUCKET_NAME;
+    const req = {
+        image: {
+            source: {
+                imageUri: fileUrl,
+            },
+        },
+        features: [
+            {
+                type: 'DOCUMENT_TEXT_DETECTION',
+            },
+        ],
+    };
+    // square bracket notation extracts the first element of an array (or first key in a dict?)
+    const [result] = await annotatorClient.batchAnnotateImages({
+        requests: [req],
+    });
 
-    // Performs text detection on the gcs file
-    // const [result] = await annotatorClient.textDetection(`gs://${bucketName}/${filename}`);
-    const [result] = await annotatorClient.textDetection(filename);
-    const detections = result.textAnnotations;
-    console.log('Text:');
-    detections.forEach((text: String) => console.log(text));
-    return detections;
+    return result.responses[0].fullTextAnnotation.text;
 };
 
 export { getText };
