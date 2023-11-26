@@ -24,6 +24,44 @@ function wordsFound(a: String, b: String) {
     return numAWords / aWords.length;
 }
 
+// removes parentheses and the words within the parentheses present within some ingredients
+function removeParentheses(inputString: String) {
+    let outputString = '';
+    let depth = 0;
+
+    for (let i = 0; i < inputString.length; i++) {
+        const char = inputString[i];
+
+        if (char === '(' || char === '[') {
+            depth++;
+        } else if (char === ')' || char === ']') {
+            depth--;
+        } else if (depth === 0) {
+            outputString += char;
+        }
+    }
+
+    return outputString.trim();
+}
+
+// conditionally formats output
+function checkIngredients(rawList: String) {
+    let ingredientList;
+    rawList = removeParentheses(rawList);
+
+    if (rawList.includes('ingredients:')) {
+        // splits the ingredients into two halves: everything before the keyword "ingredients:" and everything after
+        ingredientList = rawList.split('ingredients:');
+
+        // make ingredientArray equal to everything after the word "ingredients:" and split it for individual elements
+        ingredientList = ingredientList[1].split(', ');
+    } else {
+        ingredientList = rawList.split(', ');
+    }
+
+    return ingredientList;
+}
+
 function translate(rawIngredientList: String) {
     // use the interface to format the chemicalDictionary into a usable form
     const chemicalDictionaryObject = chemicalDictionary as Dictionary;
@@ -33,8 +71,11 @@ function translate(rawIngredientList: String) {
         .replace(/(\r\n|\n|\r)/gm, ' ')
         .toLowerCase();
 
-    // splits the ingredients into an array
-    let ingredientArray = rawIngredientList.split(', ');
+    // use helper method to declare ingredientArray
+    let ingredientArray = checkIngredients(rawIngredientList);
+
+    // holds the original ingredient name and the "translation"
+    let updatedIngredientArray = [];
 
     // iterate through every element within the the ingredientArray list
     for (let i = 0; i < ingredientArray.length; i++) {
@@ -46,13 +87,20 @@ function translate(rawIngredientList: String) {
                     wordsFound(ingredientArray[i], chem) >=
                 0.5
             ) {
-                ingredientArray[i] = chemicalDictionaryObject[chem];
+                // pushes an object containing the original name of the ingredient and the translation of that ingredient
+                updatedIngredientArray.push({
+                    originalName: ingredientArray[i],
+                    translation: chemicalDictionaryObject[chem],
+                });
             }
         }
-        console.log(ingredientArray);
     }
 
-    return ingredientArray.join(', ');
+    // returns the original list of ingredients, as well as the key/value translation pairs
+    return {
+        originalIngredientsArray: ingredientArray,
+        translatedArray: updatedIngredientArray,
+    };
 }
 
 export default translate;
