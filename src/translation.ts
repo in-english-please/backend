@@ -47,6 +47,8 @@ function removeParentheses(inputString: String) {
 // conditionally formats output
 function checkIngredients(rawList: String) {
     let ingredientList;
+
+    // removes the parentheses from the raw string
     rawList = removeParentheses(rawList);
 
     if (rawList.includes('ingredients:')) {
@@ -57,6 +59,19 @@ function checkIngredients(rawList: String) {
         ingredientList = ingredientList[1].split(', ');
     } else {
         ingredientList = rawList.split(', ');
+    }
+
+    console.log(ingredientList);
+
+    // finds the index of the first element in the ingredient list that includes a period, which would be the last ingredient of the list
+    const lastIngredient = ingredientList.findIndex((x) => x.includes('.'));
+
+    // if ingredient ending in period is found
+    if (lastIngredient != -1) {
+        // cut everything occuring after the period out of the final item in the ingredients list
+        ingredientList[lastIngredient] =
+            ingredientList[lastIngredient].split('.')[0];
+        ingredientList = ingredientList.slice(0, lastIngredient + 1);
     }
 
     return ingredientList;
@@ -71,6 +86,7 @@ function translate(rawIngredientList: String) {
         .replace(/(\r\n|\n|\r)/gm, ' ')
         .toLowerCase();
 
+    console.log(rawIngredientList);
     // use helper method to declare ingredientArray
     let ingredientArray = checkIngredients(rawIngredientList);
 
@@ -79,19 +95,24 @@ function translate(rawIngredientList: String) {
 
     // iterate through every element within the the ingredientArray list
     for (let i = 0; i < ingredientArray.length; i++) {
+        let maxScore = 0;
+        // trims every element within the ingredientArray to remove trailing and leading spaces
+        ingredientArray[i] = ingredientArray[i].trim();
+
         // iterate through the chemicalDictionary
         for (let chem in chemicalDictionary) {
-            // if the similarity between the two strings chem and ingredientArray[i] is greater than or equal to 50%, we translate it
-            if (
+            let score =
                 wordsFound(chem, ingredientArray[i]) *
-                    wordsFound(ingredientArray[i], chem) >=
-                0.5
-            ) {
+                wordsFound(ingredientArray[i], chem);
+            // if the similarity between the two strings chem and ingredientArray[i] is greater than or equal to 50%, we translate it
+            if (score >= 0.5 && score > maxScore) {
                 // pushes an object containing the original name of the ingredient and the translation of that ingredient
                 updatedIngredientArray.push({
                     originalName: ingredientArray[i],
                     translation: chemicalDictionaryObject[chem],
                 });
+
+                maxScore = score;
             }
         }
     }
