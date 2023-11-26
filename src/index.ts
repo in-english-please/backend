@@ -65,6 +65,11 @@ app.post('/upload', uploadHandler.single('image'), async (req: any, res) => {
         res.status(422).send('Invalid filetype ' + req.incorrectType);
     }
 
+    if (!req.file || !req.file.linkUrl) {
+        // if image type is incorrect, error message
+        res.status(400).send('No file uploaded');
+    }
+
     // send url to vision api and get text
     let text = await getText(req.file.linkUrl);
 

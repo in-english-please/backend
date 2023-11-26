@@ -25,6 +25,9 @@ const getText: any = async (fileUrl: String) => {
         requests: [req],
     });
 
+    // no text detected
+    if (!result.responses[0].fullTextAnnotation) return '';
+
     return result.responses[0].fullTextAnnotation.text;
 };
 
